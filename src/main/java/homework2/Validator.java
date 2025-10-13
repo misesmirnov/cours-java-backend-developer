@@ -8,54 +8,43 @@ public class Validator {
         this.part = part;
     }
 
-    public String[] getExpression() {
-        return part;
-    }
-
-    public boolean isValidateExpression() {
-        boolean valid = false;
+    public void validateExpression() throws ValidationException {
+        if (part == null) {
+            throw new ValidationException("Выражение не может быть null");
+        }
         // проверяем кол-во операторов в выражении
         if (part.length != 3) {
-            getErrorMessage("Предайте выражение в формате а + b");
-            return false;
+            throw new InvalidFormatException();
         }
         //проверяем a
-        if (!isOperandValid(part[0])) {
-            getErrorMessage("Некорректный формат числа  а " + part[0]);
-            return false;
-        }
+        validateOperand(part[0], "a");
         //проверяем b
-        if (!isOperandValid(part[2])) {
-            getErrorMessage("Некорректный формат числа  b " + part[2]);
-            return false;
-        }
+        validateOperand(part[2], "b");
         // проверяем оператор
-        if (!isOperatorValid(part[1])) {
-            getErrorMessage("Неподдерживаемый тип операции " + part[0]);
-        }
-        return true;
+        validateOperator(part[1]);
     }
 
-    private boolean isOperandValid(String operand) {
+    private void validateOperand(String operand, String value) throws InvalidOperandException {
+        if (operand == null) {
+            throw new InvalidOperandException(operand, "Пустое число");
+        }
         try {
             Double.parseDouble(operand);
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (NumberFormatException e) {
+            throw new InvalidOperandException(operand, value);
         }
     }
 
-    private boolean isOperatorValid(String operator) {
+    private void validateOperator(String operator) throws InvalidOperatorException {
+        boolean valid = false;
         for (Operator type : Operator.values()) {
             if (type.getOperator().equals(operator)) {
-                return true;
+                valid = true;
+                break;
             }
         }
-        return false;
+        if (!valid) {
+            throw new InvalidOperatorException(operator);
+        }
     }
-
-    private void getErrorMessage(String message) {
-        System.out.println("Ошибка: " + message);
-    }
-
 }
