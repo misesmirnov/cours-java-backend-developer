@@ -29,16 +29,21 @@ public class CalculationApp {
             Parser parser = new Parser(expression);
             //проверка полученного выражения
             Validator validator = new Validator(parser.getPart());
-            if (validator.isValidateExpression()) {
-                //Если все проверки прошли, то создаем калькулятор
-                Calculator calculator = new Calculator(parser.getFirstOperand(),
-                        parser.getSecondOperand(),
-                        parser.getOperator());
-                double result = calculator.calculate();
-                if (!Double.isNaN(result)) {
-                    //если вернули корректный результат, то печатаем его в консоль
-                    System.out.println("Результат: " + result);
-                }
+            try {
+                validator.validateExpression();
+            } catch (ValidationException e) {
+                System.out.println(e.getMessage());
+                continue;
+            }
+
+            //Если все проверки прошли, то создаем калькулятор
+            Calculator calculator = new Calculator(parser.getFirstOperand(),
+                    parser.getSecondOperand(),
+                    parser.getOperator());
+            double result = calculator.calculate();
+            if (!Double.isNaN(result)) {
+                //если вернули корректный результат, то печатаем его в консоль
+                System.out.println("Результат: " + result);
             }
         }
     }
